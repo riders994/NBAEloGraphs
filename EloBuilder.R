@@ -28,5 +28,8 @@ levels(week_factor) = week_levs
 Long_Elos = current_elos %>% gather(week, elo, -c(Players))
 Long_Elos$week = week_factor
 
-ggplot(Long_Elos, aes(x=week, y=elo, group=Players, color=Players)) + geom_line()
+ggplot(Long_Elos, aes(x=week, y=elo, group=Players, color=Players, symbols=Players)) + geom_line(linewidth = 2) + geom_point()
 
+
+out_graph = './2024_dynasty_week_%s.png'
+ggsave(sprintf(out_graph, as.character(length(levels(week_factor)) - 1)), device = 'png', width = 16, height = 9)
