@@ -1,7 +1,7 @@
 library(ggplot2)
 library(tidyr)
 
-CURR_ELOS_FILE = "weekly_elo.csv"
+CURR_ELOS_FILE = "seasonal_elos_02.csv"
 
 current_elos = read.csv(CURR_ELOS_FILE)
 
