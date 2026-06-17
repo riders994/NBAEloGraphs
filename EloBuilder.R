@@ -1,35 +1,41 @@
 library(ggplot2)
 library(tidyr)
 
-CURR_ELOS_FILE = "seasonal_elos_02.csv"
+build_elo_graph = function(csv_file, output_png) {
+  current_elos = read.csv(csv_file)
 
-current_elos = read.csv(CURR_ELOS_FILE)
+  d = dim(current_elos)
+  week = d[2] - 2
 
-d = dim(current_elos)
-week = d[2] - 2
+  names(current_elos)[names(current_elos) == "X"] <- "Players"
 
-names(current_elos)[names(current_elos) == "X"] <- "Players"
+  current_elos$Players = as.factor(current_elos$Players)
 
+  week_levs = c()
+  week_factor = c()
+  for (i in (1:(week + 1))){
+    week_factor = c(week_factor, rep(i, d[1]))
+    week_levs = c(week_levs, paste('week_', i - 1, sep=''))
+  }
 
-current_elos$Players = as.factor(current_elos$Players)
+  week_factor = factor(week_factor)
+  levels(week_factor) = week_levs
 
-week_levs = c()
-week_factor = c()
-curr_week_fac = c()
-curr_week_levs = c()
-for (i in (1:(week + 1))){
-  week_factor = c(week_factor, rep(i, d[1]))
-  week_levs = c(week_levs, paste('week_', i - 1, sep=''))
+  Long_Elos = current_elos %>% gather(week, elo, -c(Players))
+  Long_Elos$week = week_factor
+
+  ggplot(Long_Elos, aes(x=week, y=elo, group=Players, color=Players, symbols=Players)) + geom_line(linewidth = 2) + geom_point()
+
+  ggsave(sprintf(output_png, as.character(length(levels(week_factor)) - 1)), device = 'png', width = 16, height = 9)
 }
 
-week_factor = factor(week_factor)
-levels(week_factor) = week_levs
+CURR_ELOS_FILE = "seasonal_elos_2.csv"  
+DYN_ELOS_FILE = "dynasty_elo.csv"  
 
-Long_Elos = current_elos %>% gather(week, elo, -c(Players))
-Long_Elos$week = week_factor
+CURR_ELOS_PNG = "2025_seasonal_week_%s.png"
+DYN_ELOS_PNG = "dynasty_week_%s.png"
 
-ggplot(Long_Elos, aes(x=week, y=elo, group=Players, color=Players, symbols=Players)) + geom_line(linewidth = 2) + geom_point()
+build_elo_graph(CURR_ELOS_FILE, CURR_ELOS_PNG)
+build_elo_graph(DYN_ELOS_FILE, DYN_ELOS_PNG)
 
-
-out_graph = './2024_dynasty_week_%s.png'
-ggsave(sprintf(out_graph, as.character(length(levels(week_factor)) - 1)), device = 'png', width = 16, height = 9)
+d = read.csv(DYN_ELOS_FILE)
