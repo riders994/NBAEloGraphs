@@ -29,13 +29,18 @@ build_elo_graph = function(csv_file, output_png) {
   ggsave(sprintf(output_png, as.character(length(levels(week_factor)) - 1)), device = 'png', width = 16, height = 9)
 }
 
-CURR_ELOS_FILE = "seasonal_elos_2.csv"  
-DYN_ELOS_FILE = "dynasty_elo.csv"  
+CURR_ELOS_FILE = "2025_season_elo.csv"
+DYN_ELOS_FILE = "dynasty_elo.csv"
 
-CURR_ELOS_PNG = "2025_seasonal_week_%s.png"
+CURR_ELOS_PNG = "2025_season_week_%s.png"
 DYN_ELOS_PNG = "dynasty_week_%s.png"
 
-build_elo_graph(CURR_ELOS_FILE, CURR_ELOS_PNG)
-build_elo_graph(DYN_ELOS_FILE, DYN_ELOS_PNG)
-
-d = read.csv(DYN_ELOS_FILE)
+if (sys.nframe() == 0) {  # only when run directly, not when sourced
+  args = commandArgs(trailingOnly = TRUE)
+  if (length(args) >= 2) {
+    build_elo_graph(args[1], args[2])
+  } else {
+    build_elo_graph(CURR_ELOS_FILE, CURR_ELOS_PNG)
+    build_elo_graph(DYN_ELOS_FILE, DYN_ELOS_PNG)
+  }
+}
